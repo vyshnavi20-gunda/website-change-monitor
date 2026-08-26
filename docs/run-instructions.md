@@ -1,22 +1,21 @@
 # Run Instructions
 
-## Requirements
+## 1. Requirements
 
-The solution requires:
+- Python 3.12 or compatible Python version
+- Internet connection
+- Git
+- Chromium browser for Playwright
 
-- Python 3.12
-- Internet access
-- The project virtual environment
-- Required Python packages
-- Playwright Chromium browser
+## 2. Open the project
 
-## 1. Open the project
+Open the `website-change-monitor` project folder in VS Code.
 
-Open the `website-change-monitor` project in VS Code.
+Open a terminal in the project folder.
 
-Open the VS Code terminal and make sure the terminal is in the project folder.
+## 3. Create a virtual environment
 
-Example:
+Run:
 
 ```powershell
-cd C:\Users\vyshn\OneDrive\Desktop\website-change-monitor
+python -m venv .venv
