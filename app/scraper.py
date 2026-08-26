@@ -46,6 +46,9 @@ def fetch_page_text(url: str) -> str:
 
         text = extract_meaningful_text(response.text)
 
+        if "performing security verification" in text.lower():
+            raise RuntimeError("anti-bot verification page returned instead of the publication")
+
         if len(text) >= 120:
             return text
 
@@ -66,7 +69,10 @@ def fetch_page_text(url: str) -> str:
             if url.lower().split("?")[0].endswith(".pdf"):
                 return "PDF document (browser text extraction unavailable)"
 
-            return page.locator("body").inner_text()
+            text = page.locator("body").inner_text()
+            if "performing security verification" in text.lower():
+                raise RuntimeError("anti-bot verification page returned instead of the publication")
+            return text
 
         finally:
             browser.close()
@@ -177,7 +183,7 @@ def looks_like_publication_link(text: str, url: str) -> bool:
     """Return True when a link looks like an official publication."""
 
     normalized_text = re.sub(r"\s+", " ", text.lower()).strip()
-    value = f"{normalized_text} {url}".lower()
+    lowered_url = url.lower()
 
     # ---------------------------------------------------------
     # 1. Reject obvious navigation and utility links.
@@ -238,8 +244,6 @@ def looks_like_publication_link(text: str, url: str) -> bool:
     # 3. Reject obvious utility URL patterns.
     # ---------------------------------------------------------
 
-    lowered_url = url.lower()
-
     if any(
         pattern in lowered_url
         for pattern in [
@@ -257,13 +261,21 @@ def looks_like_publication_link(text: str, url: str) -> bool:
         return False
 
     # ---------------------------------------------------------
-    # 4. Publication keywords are still required.
+    # 4. A keyword in an investor-section URL alone is not enough: it
+    # would turn every share-price or governance navigation page into an
+    # update.  Accept a meaningful label, a document, or a news-style URL.
     # ---------------------------------------------------------
 
+    if lowered_url.split("?")[0].endswith((".pdf", ".xlsx", ".xls")):
+        return True
+
+    if any(keyword in normalized_text for keyword in PUBLICATION_KEYWORDS):
+        return True
+
     return any(
-        keyword in value
-        for keyword in PUBLICATION_KEYWORDS
-    )
+        marker in urlparse(lowered_url).path
+        for marker in ("/news/", "/press-releases/", "/releases/", "/announcements/")
+    ) and len(normalized_text) >= 12
 
 
 def extract_date(text: str) -> str | None:
@@ -294,7 +306,12 @@ def title_for_link(text: str, url: str) -> str:
         "read more",
         "more",
     }:
-        return text[:500]
+        cleaned = re.sub(r"\s+", " ", text).strip()
+        # Some corporate sites wrap an entire card in one link.  In that
+        # case the ellipsis separates its headline from teaser copy.
+        if "..." in cleaned:
+            cleaned = cleaned.split("...", 1)[0].strip()
+        return cleaned[:250]
 
     slug = urlparse(url).path.rstrip("/").split("/")[-1]
 
@@ -304,10 +321,34 @@ def title_for_link(text: str, url: str) -> str:
     )
 
 
+def date_near_link(link) -> str | None:
+    """Find a website date near a listing link, rather than only in its label."""
+    if link.find("time"):
+        value = link.find("time").get("datetime") or link.find("time").get_text(" ", strip=True)
+        if value:
+            return value.strip()
+
+    container = link
+    for _ in range(3):
+        container = container.parent
+        if container is None:
+            break
+        time_tag = container.find("time")
+        if time_tag:
+            value = time_tag.get("datetime") or time_tag.get_text(" ", strip=True)
+            if value:
+                return value.strip()
+        date = extract_date(container.get_text(" ", strip=True))
+        if date:
+            return date
+    return None
+
+
 def publications_from_html(
     html: str,
     url: str,
     company: str,
+    allowed_hosts: tuple[str, ...] = (),
 ) -> list[dict]:
     """Extract candidates from either a fast HTTP response or rendered HTML."""
 
@@ -336,10 +377,8 @@ def publications_from_html(
         ):
             continue
 
-        if (
-            urlparse(absolute_url).netloc
-            != urlparse(url).netloc
-        ):
+        hosts = set(allowed_hosts) or {urlparse(url).netloc}
+        if urlparse(absolute_url).netloc not in hosts:
             continue
 
         seen_urls.add(absolute_url)
@@ -352,7 +391,7 @@ def publications_from_html(
                     absolute_url,
                 ),
                 "url": absolute_url,
-                "date": extract_date(text),
+                "date": date_near_link(link),
                 "type": classify_publication(
                     text,
                     absolute_url,
@@ -366,6 +405,7 @@ def publications_from_html(
 def fetch_publications(
     url: str,
     company: str,
+    allowed_hosts: tuple[str, ...] = (),
 ) -> list[dict]:
     """
     Open a company website and discover likely publication links.
@@ -385,7 +425,7 @@ def fetch_publications(
         publications = publications_from_html(
             response.text,
             url,
-            company,
+            company, allowed_hosts,
         )
 
         if publications:
@@ -415,7 +455,7 @@ def fetch_publications(
     return publications_from_html(
         html,
         url,
-        company,
+        company, allowed_hosts,
     )
 
 

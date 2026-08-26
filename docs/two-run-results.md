@@ -1,26 +1,14 @@
-# Two-Run Results
+# Two-run results
 
-## Run 1 — Initial comparison
+## Run 1 — baseline
 
-The first monitoring run checked all five companies:
+The first run checks the curated official publication pages for Norsk Hydro, Constellium, Alcoa, Ma'aden, and Rio Tinto. Every accepted publication is saved with its normalized title key, source URL, website date (when shown), first-found UTC timestamp, content hash, and a retained content version. Baseline items are deliberately marked `NEW`: there is no earlier comparison at that point.
 
-- Norsk Hydro
-- Constellium
-- Alcoa
-- Ma'aden
-- Rio Tinto
+## Run 2 — comparison
 
-The process discovered and stored official publication pages and their content hashes in the local database.
+The second run uses the same database and sources. The recorded comparison result was:
 
-The first run established the baseline used for future comparisons.
-
-## Run 2 — Later comparison
-
-The monitoring process was run again after the baseline had been stored.
-
-Results:
-
-| Company | Status | New | Updated |
+| Company | Check status | New | Updated |
 |---|---|---:|---:|
 | Norsk Hydro | OK | 0 | 0 |
 | Constellium | OK | 0 | 0 |
@@ -28,24 +16,14 @@ Results:
 | Ma'aden | OK | 0 | 0 |
 | Rio Tinto | OK | 0 | 0 |
 
-The daily report stated:
+The business report read: “No new or meaningfully changed publications.” Each site’s latest timestamp and any warning are available in the console report, dashboard, and SQLite `site_checks` table.
 
-> No new or meaningfully changed publications.
+## How the comparison works
 
-All five website checks completed successfully.
+1. The scraper starts with curated publication pages, then checks the homepage for newly exposed official links.
+2. It excludes navigation, stock/utility pages, rotating homepage content, cookie controls, and anti-bot verification pages.
+3. It uses a normalized title key to merge the same item found in multiple sections and recognizes a move when that key has a different source URL.
+4. It hashes cleaned article/report content. A missing key is `NEW`; a changed hash or source URL is `UPDATED`; an identical item becomes `SEEN` and is omitted from the next report.
+5. A source or item failure is stored and shown as a warning/error; it can never produce a “no change” conclusion.
 
-## How the process decided what changed
-
-For each discovered publication, the monitor:
-
-1. Creates a normalized key from the publication title.
-2. Checks whether the publication already exists in the local database.
-3. Downloads the current publication content.
-4. Creates a SHA-256 hash of the content.
-5. Compares the current hash with the previously saved version.
-6. Reports the publication as `NEW` if it has not been seen before.
-7. Reports it as `UPDATED` if the content or source URL has changed.
-8. Treats unchanged publications as `SEEN` and does not report them as changes.
-9. Saves the latest version so it can be compared during the next daily run.
-
-This allows the second run to distinguish between genuinely new or changed publications and pages that have remained unchanged.
+The retained content versions provide the evidence for the short “what changed” explanation in the daily report.

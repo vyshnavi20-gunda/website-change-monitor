@@ -16,19 +16,10 @@ from app.database import (
 from app.scraper import fetch_page_text, fetch_publications
 
 
-DISCOVERY_PATHS = (
-    "news",
-    "media",
-    "press-releases",
-    "investors",
-    "investor-relations",
-    "reports",
-    "publications",
-    "announcements",
-    "updates",
-)
-
-MAX_PUBLICATIONS_PER_SITE = 25
+# Checking the newest 15 publications per company keeps the daily run bounded.
+# Older pages are already in the historical baseline; new links are discovered
+# from the curated listing sources on the next run.
+MAX_PUBLICATIONS_PER_SITE = 15
 
 
 def canonical_company(company: str) -> str:
@@ -142,6 +133,7 @@ def check_website(
     company: str,
     url: str,
     sections: tuple[str, ...] = (),
+    allowed_hosts: tuple[str, ...] = (),
 ) -> dict:
 
     initialize_database()
@@ -157,11 +149,11 @@ def check_website(
         section_errors = []
         successful_sections = 0
 
-        # Check known official sections first.
-        # Generic paths are used as a fallback.
+        # Check the curated publication sources before the homepage.  Do not
+        # probe guessed paths: a 404 is not useful monitoring evidence.
         paths = tuple(
             dict.fromkeys(
-                ("", *sections, *DISCOVERY_PATHS)
+                (*sections, url)
             )
         )
 
@@ -172,7 +164,7 @@ def check_website(
             try:
                 discovered = fetch_publications(
                     section_url,
-                    stored_company,
+                    stored_company, allowed_hosts,
                 )
 
                 successful_sections += 1
@@ -210,13 +202,10 @@ def check_website(
                 if len(candidates) >= MAX_PUBLICATIONS_PER_SITE:
                     break
 
-            if len(candidates) >= MAX_PUBLICATIONS_PER_SITE:
-                break
-
         new_items = []
         updated_items = []
 
-        for key, item in candidates.items():
+        for key, item in list(candidates.items())[:MAX_PUBLICATIONS_PER_SITE]:
 
             try:
                 content = fetch_page_text(
@@ -335,12 +324,6 @@ def check_website(
                     content_hash,
                     summary,
                     "updated",
-                    checked_at,
-                )
-
-                save_publication_version(
-                    previous[0],
-                    content,
                     checked_at,
                 )
 

@@ -5,7 +5,7 @@ Norsk Hydro, Constellium, Alcoa, Ma'aden, and Rio Tinto.
 
 ## What it checks
 
-`main.py` checks each starting domain and likely publication sections such as News, Media, Press Releases, Investor Relations, Reports, Publications, Announcements, and Updates. Playwright renders JavaScript pages. Candidate links are opened and their meaningful visible text is hashed, so a changed article is reported even when its website publication date stays the same. PDF links are hashed as binary documents, but PDF internals are never printed as report text.
+`main.py` checks each homepage plus curated official News, Press Release, Investor Relations and report pages. It does not probe guessed paths, because a routine 404 is not useful monitoring evidence. Playwright renders JavaScript pages when a normal HTTP response is insufficient. Candidate links are opened and their meaningful visible text is hashed, so a changed article is reported even when its website publication date stays the same. PDF links are hashed as binary documents, but PDF internals are never printed as report text.
 
 SQLite stores:
 
@@ -34,6 +34,53 @@ For the same check plus a local report in a separate browser window, run:
 Leave that terminal open while using the dashboard; press `Ctrl+C` to stop it.
 
 The first run stores the discovered baseline and reports those publications as `NEW`. Run it again later; it reports only new or meaningfully changed publications. Previous `NEW` and `UPDATED` rows are closed at the start of the next check, so they are not repeated forever. A later unchanged run prints `No new or meaningfully changed publications.` and still lists the latest status for all sites.
+
+To retry only one company after a warning, run (for example):
+
+```powershell
+.venv\Scripts\python.exe main.py --company "Ma'aden"
+```
+
+Use `--database data/trial-monitor.db` for a fresh trial baseline without changing the daily history.
+
+## Optional update notifications
+
+Set `MONITOR_WEBHOOK_URL` to an incoming webhook for Teams, Slack, Discord, or an approved automation relay. The monitor posts one short alert only when it finds `NEW` or `UPDATED` publications; it does not notify on a no-change run. The webhook URL is not stored in this project.
+
+```powershell
+$env:MONITOR_WEBHOOK_URL = "https://your-approved-webhook.example/secret"
+.venv\Scripts\python.exe main.py
+```
+
+For a one-off run, pass `--webhook-url` instead. Test the configured webhook with a known fresh trial database before putting it in Task Scheduler.
+
+### Simple Windows notification
+
+No external service is required. Add `--toast` to show a small Windows notification-center alert only when the monitor finds a new or changed publication:
+
+```powershell
+.venv\Scripts\python.exe main.py --toast
+```
+
+Preview the notification safely, without checking a site or changing saved monitoring data:
+
+```powershell
+.venv\Scripts\python.exe main.py --demo-toast
+```
+
+## Trainer demo
+
+To demonstrate the notification feature during review, either double-click `Show Notification Demo.bat` or run:
+
+```powershell
+.venv\Scripts\python.exe main.py --demo-toast
+```
+
+This opens a sample Windows notification and does not check websites or change the SQLite monitoring history. For a live check, use `Run Monitor with Popup.bat`; it sends a notification only if a real new or updated publication is found.
+
+For Task Scheduler, use the same argument and choose **Run only when user is logged on**. A notification cannot appear on a locked or signed-out Windows desktop; the monitor still records the result in its database.
+
+For the easiest setup, double-click `Install Daily Popup.bat`. It creates an hourly notification task, so updates can be shown throughout the day or night while you are logged in. Double-click `Run Monitor with Popup.bat` whenever you want to run it immediately.
 
 The first Playwright setup may require:
 
@@ -65,7 +112,7 @@ Keep `data/monitor.db` and the console output as evidence for review. Do not del
 
 ## Add another website
 
-Add one configuration object to `SITES` in `app/sites.py`, with a company name, root URL, and its official publication section paths. The generic section discovery and persistence code does not need redesigning. If a site uses unusual section paths, add them to that site's `sections` list; `DISCOVERY_PATHS` remains the fallback.
+Add one configuration object to `SITES` in `app/sites.py`, with a company name, root URL, and its official publication section URLs. The persistence code does not need redesigning. If the site uses an official publication subdomain, add it to `allowed_hosts`.
 
 ## Evidence and known limits
 
