@@ -1,0 +1,1196 @@
+<!doctype html>
+
+<html lang="en">
+
+<head>
+
+  <meta charset="utf-8">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>OrePulse Intelligence</title>
+
+
+  <style>
+    :root {
+      --ink: #172b3a;
+      --muted: #667786;
+      --line: #dbe4e9;
+      --paper: #ffffff;
+      --bg: #f4f7f9;
+
+      --brand: #0d6474;
+      --brand-dark: #083f4b;
+
+      --good: #16734b;
+      --good-bg: #e3f6ec;
+
+      --warn: #a35b00;
+      --warn-bg: #fff2d8;
+
+      --bad: #b3261e;
+      --bad-bg: #fde8e7;
+
+      --shadow: 0 6px 20px rgba(31, 66, 81, 0.08);
+    }
+
+
+    * {
+      box-sizing: border-box;
+    }
+
+
+    body {
+      margin: 0;
+
+      font-family:
+        Inter,
+        Segoe UI,
+        Arial,
+        sans-serif;
+
+      line-height: 1.5;
+
+      color: var(--ink);
+
+      background: var(--bg);
+    }
+
+
+    /* =====================================================
+       HEADER
+       ===================================================== */
+
+    header {
+      color: white;
+
+      background:
+        linear-gradient(115deg,
+          var(--brand-dark),
+          var(--brand));
+
+      padding:
+        34px max(24px, calc((100% - 1180px) / 2));
+    }
+
+
+    h1 {
+      margin: 0;
+
+      font:
+        700 clamp(28px, 4vw, 43px) Georgia,
+        serif;
+    }
+
+
+    header p {
+      margin: 8px 0 0;
+
+      color: #cfedf0;
+
+      font-size: 15px;
+    }
+
+
+    /* =====================================================
+       MAIN
+       ===================================================== */
+
+    main {
+      width:
+        min(1180px,
+          calc(100% - 36px));
+
+      margin:
+        30px auto 60px;
+    }
+
+
+    /* =====================================================
+       METRICS
+       ===================================================== */
+
+    .metrics {
+      display: flex;
+
+      flex-wrap: wrap;
+
+      gap: 12px;
+
+      margin-bottom: 28px;
+    }
+
+
+    .metric {
+      flex: 1;
+
+      min-width: 180px;
+
+      background: var(--paper);
+
+      border:
+        1px solid var(--line);
+
+      border-radius: 14px;
+
+      padding: 16px 20px;
+
+      box-shadow: var(--shadow);
+    }
+
+
+    .metric b {
+      display: block;
+
+      font-size: 28px;
+
+      color: var(--brand-dark);
+    }
+
+
+    .metric span {
+      color: var(--muted);
+
+      font-size: 12px;
+
+      text-transform: uppercase;
+
+      letter-spacing: 0.7px;
+    }
+
+
+    .metric.danger b {
+      color: var(--bad);
+    }
+
+
+    /* =====================================================
+       SECTION HEADINGS
+       ===================================================== */
+
+    h2 {
+      margin: 0;
+
+      font:
+        700 24px Georgia,
+        serif;
+    }
+
+
+    .intro {
+      color: var(--muted);
+
+      margin:
+        5px 0 18px;
+    }
+
+
+    /* =====================================================
+       COMPANY BUTTONS
+       ===================================================== */
+
+    .company-grid {
+      display: grid;
+
+      grid-template-columns:
+        repeat(5, 1fr);
+
+      gap: 12px;
+
+      margin-bottom: 30px;
+    }
+
+
+    .company {
+      appearance: none;
+
+      cursor: pointer;
+
+      text-align: left;
+
+      min-height: 145px;
+
+      padding: 17px;
+
+      border:
+        1px solid var(--line);
+
+      border-radius: 14px;
+
+      background: var(--paper);
+
+      color: var(--ink);
+
+      transition:
+        0.15s transform,
+        0.15s border-color,
+        0.15s box-shadow;
+    }
+
+
+    .company:hover,
+    .company:focus-visible {
+      transform: translateY(-2px);
+
+      border-color: var(--brand);
+
+      box-shadow:
+        0 8px 22px rgba(31, 66, 81, 0.14);
+
+      outline: none;
+    }
+
+
+    .company.active {
+      border-color: var(--brand);
+
+      box-shadow:
+        0 0 0 3px #a5e4e8;
+
+      background: #fbffff;
+    }
+
+
+    .company-name {
+      display: block;
+
+      font-weight: 700;
+
+      font-size: 17px;
+
+      margin-bottom: 17px;
+    }
+
+
+    .company-url {
+      display: block;
+
+      color: var(--muted);
+
+      font-size: 12px;
+
+      margin-top: 12px;
+
+      overflow: hidden;
+
+      white-space: nowrap;
+
+      text-overflow: ellipsis;
+    }
+
+
+    /* =====================================================
+       STATUS PILLS
+       ===================================================== */
+
+    .pill {
+      display: inline-block;
+
+      padding:
+        5px 10px;
+
+      border-radius: 999px;
+
+      font-size: 12px;
+
+      font-weight: 700;
+    }
+
+
+    .updates {
+      color: var(--warn);
+
+      background: var(--warn-bg);
+    }
+
+
+    .clear {
+      color: var(--good);
+
+      background: var(--good-bg);
+    }
+
+
+    .error {
+      color: var(--bad);
+
+      background: var(--bad-bg);
+    }
+
+
+    /* =====================================================
+       COMPANY DETAIL PANEL
+       ===================================================== */
+
+    .panel {
+      background: var(--paper);
+
+      border:
+        1px solid var(--line);
+
+      border-radius: 16px;
+
+      padding:
+        clamp(18px, 3vw, 28px);
+
+      box-shadow: var(--shadow);
+    }
+
+
+    .panel-top {
+      display: flex;
+
+      align-items: flex-start;
+
+      justify-content: space-between;
+
+      gap: 20px;
+
+      border-bottom:
+        1px solid var(--line);
+
+      padding-bottom: 18px;
+
+      margin-bottom: 5px;
+    }
+
+
+    .company-heading {
+      display: flex;
+
+      align-items: center;
+
+      gap: 10px;
+
+      flex-wrap: wrap;
+    }
+
+
+    .company-heading h2 {
+      margin: 0;
+    }
+
+
+    .website-link {
+      display: inline-block;
+
+      margin-top: 7px;
+
+      color: var(--brand);
+
+      font-weight: 600;
+
+      text-decoration: none;
+    }
+
+
+    .website-link:hover {
+      text-decoration: underline;
+    }
+
+
+    .check-time {
+      color: var(--muted);
+
+      font-size: 13px;
+
+      text-align: right;
+
+      min-width: 190px;
+    }
+
+
+    .check-time strong {
+      color: var(--ink);
+    }
+
+
+    /* =====================================================
+       UPDATE HEADER
+       ===================================================== */
+
+    .section-label {
+      margin:
+        20px 0 2px;
+
+      font-size: 12px;
+
+      font-weight: 800;
+
+      color: var(--brand);
+
+      text-transform: uppercase;
+
+      letter-spacing: 0.8px;
+    }
+
+
+    .update-count {
+      color: var(--warn);
+
+      font-size: 13px;
+
+      font-weight: 700;
+    }
+
+
+    /* =====================================================
+       PUBLICATIONS
+       ===================================================== */
+
+    .publication {
+      padding:
+        20px 0;
+
+      border-bottom:
+        1px solid var(--line);
+    }
+
+
+    .publication:last-child {
+      border-bottom: 0;
+    }
+
+
+    .type {
+      color: var(--brand);
+
+      font-size: 12px;
+
+      font-weight: 800;
+
+      text-transform: uppercase;
+
+      letter-spacing: 0.7px;
+    }
+
+
+    .publication h3 {
+      margin:
+        6px 0;
+
+      font-size: 20px;
+
+      line-height: 1.35;
+    }
+
+
+    .publication a {
+      color: var(--ink);
+
+      text-decoration: none;
+    }
+
+
+    .publication a:hover {
+      color: var(--brand);
+
+      text-decoration: underline;
+    }
+
+
+    .meta {
+      color: var(--muted);
+
+      font-size: 13px;
+
+      margin-bottom: 10px;
+    }
+
+
+    .summary {
+      margin: 0;
+
+      color: #3f505d;
+
+      line-height: 1.65;
+    }
+
+
+    .source-button {
+      display: inline-block;
+
+      margin-top: 12px;
+
+      padding:
+        7px 11px;
+
+      border-radius: 7px;
+
+      color: var(--brand);
+
+      background: #eef8fa;
+
+      font-size: 12px;
+
+      font-weight: 700;
+
+      text-decoration: none;
+    }
+
+
+    .source-button:hover {
+      background: #dceff2;
+
+      text-decoration: none;
+    }
+
+
+    /* =====================================================
+       EMPTY / ERROR MESSAGE
+       ===================================================== */
+
+    .message {
+      padding: 30px;
+
+      margin-top: 18px;
+
+      border-radius: 12px;
+
+      text-align: center;
+    }
+
+
+    .message strong {
+      font-size: 17px;
+    }
+
+
+    .message p {
+      margin:
+        8px auto 0;
+
+      color: var(--muted);
+
+      max-width: 680px;
+    }
+
+
+    .clear-box {
+      background: var(--good-bg);
+
+      color: var(--good);
+    }
+
+
+    .error-box {
+      background: var(--bad-bg);
+
+      color: var(--bad);
+    }
+
+
+    .latest-heading {
+      margin-top: 28px;
+    }
+
+
+    .latest-note {
+      color: var(--muted);
+
+      font-size: 13px;
+
+      margin-top: 4px;
+    }
+
+
+    .hidden {
+      display: none;
+    }
+
+
+    /* =====================================================
+       FOOTER
+       ===================================================== */
+
+    .footer-note {
+      margin-top: 25px;
+
+      color: var(--muted);
+
+      text-align: center;
+
+      font-size: 12px;
+    }
+
+
+    /* =====================================================
+       RESPONSIVE
+       ===================================================== */
+
+    @media (max-width: 1000px) {
+
+      .company-grid {
+        grid-template-columns:
+          repeat(3, 1fr);
+      }
+
+    }
+
+
+    @media (max-width: 650px) {
+
+      main {
+        width:
+          calc(100% - 24px);
+      }
+
+
+      header {
+        padding:
+          26px 18px;
+      }
+
+
+      .company-grid {
+        grid-template-columns:
+          1fr 1fr;
+      }
+
+
+      .company {
+        min-height: 120px;
+      }
+
+
+      .panel-top {
+        display: block;
+      }
+
+
+      .check-time {
+        text-align: left;
+
+        margin-top: 12px;
+      }
+
+    }
+
+
+    @media (max-width: 420px) {
+
+      .company-grid {
+        grid-template-columns: 1fr;
+      }
+
+    }
+  </style>
+
+</head>
+
+
+<body>
+
+
+  <!-- =====================================================
+       HEADER
+       ===================================================== -->
+
+  <header>
+
+    <h1>SignalForge</h1>
+
+    <p>
+      Official corporate publication monitoring and change intelligence.
+    </p>
+
+  </header>
+
+
+  <main>
+
+
+    <!-- ===================================================
+         SUMMARY METRICS
+         =================================================== -->
+
+    <section class="metrics" aria-label="Monitoring summary">
+
+      <div class="metric">
+
+        <b>{{ total_websites }}</b>
+
+        <span>
+          Companies monitored
+        </span>
+
+      </div>
+
+
+      <div class="metric">
+
+        <b>{{ websites_checked }}</b>
+
+        <span>
+          Successful checks
+        </span>
+
+      </div>
+
+
+      <div class="metric">
+
+        <b>{{ publications|length }}</b>
+
+        <span>
+          Current updates
+        </span>
+
+      </div>
+
+
+      <div class="metric {% if failed_checks > 0 %}danger{% endif %}">
+
+        <b>{{ failed_checks }}</b>
+
+        <span>
+          Failed checks
+        </span>
+
+      </div>
+
+    </section>
+
+
+    <!-- ===================================================
+         COMPANY SELECTION
+         =================================================== -->
+
+    <section>
+
+      <h2>
+        Corporate Signals
+      </h2>
+
+      <p class="intro">
+        Track the latest official publications, announcements and meaningful changes.
+      </p>
+
+
+      <div class="company-grid">
+
+        {% for entry in companies %}
+
+        <button class="company {% if loop.first %}active{% endif %}" type="button" data-company="{{ entry.company }}"
+          aria-pressed="{{ 'true' if loop.first else 'false' }}">
+
+          <span class="company-name">
+            {{ entry.company }}
+          </span>
+
+
+          {% if entry.state == "updates" %}
+
+          <span class="pill updates">
+
+            {{ entry.update_count }}
+
+            new update{% if entry.update_count != 1 %}s{% endif %}
+
+          </span>
+
+
+          {% elif entry.state == "error" %}
+
+          <span class="pill error">
+
+            Check failed
+
+          </span>
+
+
+          {% else %}
+
+          <span class="pill clear">
+
+            No new updates
+
+          </span>
+
+          {% endif %}
+
+
+          <span class="company-url">
+
+            {{ entry.url }}
+
+          </span>
+
+        </button>
+
+        {% endfor %}
+
+      </div>
+
+    </section>
+
+
+    <!-- ===================================================
+         COMPANY DETAILS
+         =================================================== -->
+
+    {% for entry in companies %}
+
+    <section class="panel company-detail {% if not loop.first %}hidden{% endif %}" data-detail="{{ entry.company }}">
+
+
+      <!-- COMPANY HEADER -->
+
+      <div class="panel-top">
+
+        <div>
+
+          <div class="company-heading">
+
+            <h2>
+              {{ entry.company }}
+            </h2>
+
+
+            {% if entry.state == "updates" %}
+
+            <span class="pill updates">
+
+              {{ entry.update_count }}
+              update{% if entry.update_count != 1 %}s{% endif %}
+
+            </span>
+
+            {% elif entry.state == "clear" %}
+
+            <span class="pill clear">
+              No new updates
+            </span>
+
+            {% elif entry.state == "error" %}
+
+            <span class="pill error">
+              Check failed
+            </span>
+
+            {% endif %}
+
+          </div>
+
+
+          <a class="website-link" href="{{ entry.url }}" target="_blank" rel="noopener">
+            Open official company website ↗
+          </a>
+
+        </div>
+
+
+        <div class="check-time">
+
+          {% if entry.check %}
+
+          Last checked<br>
+
+          <strong>
+            {{ entry.check.checked_at }}
+          </strong>
+
+          {% else %}
+
+          Not checked yet
+
+          {% endif %}
+
+        </div>
+
+      </div>
+
+
+      <!-- =================================================
+             ERROR STATE
+             ================================================= -->
+
+      {% if entry.check and entry.check.status == "error" %}
+
+      <div class="message error-box">
+
+        <strong>
+          This company could not be checked.
+        </strong>
+
+        <p>
+          {{ entry.check.error or
+          "The monitoring process reported an unknown error." }}
+        </p>
+
+      </div>
+
+
+      <!-- =================================================
+             NEW / UPDATED PUBLICATIONS
+             ================================================= -->
+
+      {% elif entry.updates %}
+
+      <div class="section-label">
+        Latest monitoring result
+      </div>
+
+      <div class="update-count">
+        {{ entry.updates|length }}
+        new or changed publication{% if entry.updates|length != 1 %}s{% endif %}
+        found.
+      </div>
+
+
+      {% for item in entry.updates %}
+
+      <article class="publication">
+
+        <span class="type">
+
+          {{ item.status|upper }}
+
+          ·
+
+          {{ item.item_type }}
+
+        </span>
+
+
+        <h3>
+
+          <a href="{{ item.source_url }}" target="_blank" rel="noopener">
+            {{ item.title }}
+          </a>
+
+        </h3>
+
+
+        <div class="meta">
+
+          <strong>Website date:</strong>
+
+          {{ item.website_date or "Not shown" }}
+
+          &nbsp; · &nbsp;
+
+          <strong>First found:</strong>
+
+          {{ item.first_found_at }}
+
+        </div>
+
+
+        <p class="summary">
+
+          {% if item.display_summary %}
+
+          {{ item.display_summary }}
+
+          {% else %}
+
+          A new or changed official publication
+          was detected during the latest monitoring cycle.
+
+          {% endif %}
+
+        </p>
+
+
+        <a class="source-button" href="{{ item.source_url }}" target="_blank" rel="noopener">
+          View official source ↗
+        </a>
+
+      </article>
+
+      {% endfor %}
+
+
+      <!-- =================================================
+             NO NEW UPDATE
+             ================================================= -->
+
+      {% else %}
+
+      <div class="message clear-box">
+
+        <strong>
+          No new updates in the latest check.
+        </strong>
+
+        <p>
+
+          The latest successful monitoring check did not
+          find a new official publication or meaningful
+          content change for {{ entry.company }}.
+
+        </p>
+
+      </div>
+
+
+      <!-- ===============================================
+               LATEST KNOWN PUBLICATIONS
+               =============================================== -->
+
+      {% if entry.latest %}
+
+      <div class="latest-heading">
+
+        <h2>
+          Latest monitored publications
+        </h2>
+
+        <p class="latest-note">
+
+          These are the most recent official publications
+          already stored by the monitoring system.
+
+        </p>
+
+      </div>
+
+
+      {% for item in entry.latest %}
+
+      <article class="publication">
+
+        <span class="type">
+
+          Latest · {{ item.item_type }}
+
+        </span>
+
+
+        <h3>
+
+          <a href="{{ item.source_url }}" target="_blank" rel="noopener">
+            {{ item.title }}
+          </a>
+
+        </h3>
+
+
+        <div class="meta">
+
+          <strong>Website date:</strong>
+
+          {{ item.website_date or "Not shown" }}
+
+          &nbsp; · &nbsp;
+
+          <strong>First found:</strong>
+
+          {{ item.first_found_at }}
+
+        </div>
+
+
+        <p class="summary">
+
+          {{ item.display_summary }}
+
+        </p>
+
+
+        <a class="source-button" href="{{ item.source_url }}" target="_blank" rel="noopener">
+          View official source ↗
+        </a>
+
+      </article>
+
+      {% endfor %}
+
+      {% endif %}
+
+      {% endif %}
+
+
+    </section>
+
+    {% endfor %}
+
+
+    <p class="footer-note">
+
+      OrePulse Intelligence · Website Change Monitoring
+
+    </p>
+
+
+  </main>
+
+
+  <!-- =====================================================
+       COMPANY SWITCHING
+       ===================================================== -->
+
+  <script>
+
+    const buttons =
+      document.querySelectorAll(".company");
+
+    const details =
+      document.querySelectorAll(".company-detail");
+
+
+    buttons.forEach(button => {
+
+      button.addEventListener("click", () => {
+
+        const company =
+          button.dataset.company;
+
+
+        buttons.forEach(otherButton => {
+
+          const active =
+            otherButton === button;
+
+          otherButton.classList.toggle(
+            "active",
+            active
+          );
+
+          otherButton.setAttribute(
+            "aria-pressed",
+            active
+          );
+
+        });
+
+
+        details.forEach(detail => {
+
+          detail.classList.toggle(
+            "hidden",
+            detail.dataset.detail !== company
+          );
+
+        });
+
+
+        // Scroll the selected company panel
+        // into view on smaller screens.
+
+        const selectedPanel =
+          document.querySelector(
+            `.company-detail[data-detail="${CSS.escape(company)}"]`
+          );
+
+
+        if (selectedPanel) {
+
+          selectedPanel.scrollIntoView({
+            behavior: "smooth",
+            block: "start"
+          });
+
+        }
+
+      });
+
+    });
+
+  </script>
+
+
+</body>
+
+</html>
