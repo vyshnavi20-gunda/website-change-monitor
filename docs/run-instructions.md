@@ -1,5 +1,9 @@
 # Run instructions
 
+## Dashboard address
+
+When the local dashboard server is running, open [http://127.0.0.1:5000/](http://127.0.0.1:5000/) in Chrome or another browser. It is a local address and works only on the computer running the project.
+
 ## One-time setup
 
 Use PowerShell in the project folder:
@@ -47,11 +51,11 @@ Use `--dashboard` to open the local review page after a run. Alternatively start
 .venv\Scripts\python.exe -m app.web
 ```
 
-Then open `http://127.0.0.1:5000/`.
+Then open [http://127.0.0.1:5000/](http://127.0.0.1:5000/).
 
 ## Schedule daily on Windows
 
-Create a Windows Task Scheduler task with a daily trigger. Use:
+Create a Windows Task Scheduler task with a daily trigger. The easiest method is to double-click `Install Background Notifications.bat` and choose daily or hourly monitoring. To create it manually, use:
 
 - Program/script: the absolute path to `.venv\Scripts\python.exe`
 - Add arguments: the absolute path to `main.py`
@@ -69,6 +73,8 @@ For a one-off test, use `--webhook-url URL`. A failed notification is printed cl
 
 Run `main.py --toast` to show a small Windows notification-center alert whenever new or changed publications are found. There is no account, credential, or webhook to configure. When scheduling this mode, select **Run only when user is logged on**—Windows cannot show a notification from a non-interactive signed-out session. The dashboard does not need to be open.
 
+For a silent manual run with no command window, double-click `Check for Updates.vbs`. It runs the same check and only displays a Windows notification when a real update is found.
+
 ## Trainer demonstration
 
 Show the notification without changing monitoring results by double-clicking `Show Notification Demo.bat`, or use this command:
@@ -78,6 +84,10 @@ Show the notification without changing monitoring results by double-clicking `Sh
 ```
 
 It displays an example notification only. Explain that the normal scheduled task runs `main.py --toast`, which uses the same notification style only when a real update is detected.
+
+## Notification timing limit
+
+The dashboard is updated only when the monitor runs. A closed dashboard does not itself watch external websites. The background task therefore checks at the selected interval and sends a Windows notification after it saves a real new or changed publication. Instant alerts would require each company to provide an official push/webhook service.
 
 ## Maintain or extend
 

@@ -279,6 +279,8 @@ def dashboard_data():
 
         if check and check.get("status") == "error":
             state = "error"
+        elif check and check.get("error"):
+            state = "warning"
         elif company_updates:
             state = "updates"
         else:
@@ -324,6 +326,18 @@ def home():
         ]
     )
 
+    if publications:
+        dashboard_notification = (
+            f"{len(publications)} new or changed publication(s) found. "
+            "Open the dashboard for details."
+        )
+    elif failed_checks:
+        dashboard_notification = (
+            f"No update was confirmed. {failed_checks} website check(s) need attention."
+        )
+    else:
+        dashboard_notification = "No new or changed publications were found in the latest check."
+
     return render_template(
         "index.html",
         publications=publications,
@@ -332,6 +346,7 @@ def home():
         websites_checked=successful_checks,
         failed_checks=failed_checks,
         checks=checks,
+        dashboard_notification=dashboard_notification,
     )
 
 

@@ -1,0 +1,16 @@
+WEBSITE CHANGE MONITOR — RECORDED INITIAL BASELINE
+===================================================
+Database: data/monitor.db
+Baseline date: 2026-08-26 (UTC)
+
+Company       First completed check (UTC)          Publications stored
+Ma'aden       2026-08-26T04:57:00.595587+00:00     27
+Alcoa         2026-08-26T04:59:27.848982+00:00     38
+Constellium   2026-08-26T05:01:01.127732+00:00     18
+Norsk Hydro   2026-08-26T05:11:25.303461+00:00     59
+Rio Tinto     2026-08-26T05:11:57.411022+00:00     31
+
+Result: The first run created a baseline of 173 discovered official
+publication records. Each record retained its source URL, website date where
+available, first-found UTC timestamp, and content hash. Subsequent runs use
+this baseline to report only NEW or UPDATED items.

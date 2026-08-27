@@ -8,7 +8,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>OrePulse Intelligence</title>
+  <title>SignalForge</title>
 
 
   <style>
@@ -679,7 +679,7 @@
 </head>
 
 
-<body>
+<body data-dashboard-notification="{{ dashboard_notification }}">
 
 
   <!-- =====================================================
@@ -693,6 +693,10 @@
     <p>
       Official corporate publication monitoring and change intelligence.
     </p>
+
+    <button id="enable-notifications" type="button">
+      Enable dashboard notifications
+    </button>
 
   </header>
 
@@ -798,6 +802,14 @@
 
           </span>
 
+          {% elif entry.state == "warning" %}
+
+          <span class="pill updates">
+
+            Check warning
+
+          </span>
+
 
           {% else %}
 
@@ -866,6 +878,12 @@
 
             <span class="pill error">
               Check failed
+            </span>
+
+            {% elif entry.state == "warning" %}
+
+            <span class="pill updates">
+              Check warning
             </span>
 
             {% endif %}
@@ -1008,6 +1026,22 @@
 
       {% else %}
 
+      {% if entry.check and entry.check.error %}
+
+      <div class="message error-box">
+
+        <strong>
+          The check completed with a warning.
+        </strong>
+
+        <p>
+          {{ entry.check.error }}
+        </p>
+
+      </div>
+
+      {% endif %}
+
       <div class="message clear-box">
 
         <strong>
@@ -1109,10 +1143,9 @@
 
     <p class="footer-note">
 
-      OrePulse Intelligence · Website Change Monitoring
+      SignalForge · Website Change Monitoring
 
     </p>
-
 
   </main>
 
@@ -1122,6 +1155,67 @@
        ===================================================== -->
 
   <script>
+
+    // The browser status alert appears after a dashboard refresh once the
+    // user has enabled notifications. Background checks use Windows toast.
+    const dashboardNotification = document.body.dataset.dashboardNotification;
+    const notificationButton = document.querySelector("#enable-notifications");
+
+    function dashboardNotificationsEnabled() {
+      return localStorage.getItem("dashboard-notifications") !== "false";
+    }
+
+    function updateNotificationButton() {
+      notificationButton.textContent = dashboardNotificationsEnabled()
+        ? "Disable dashboard notifications"
+        : "Enable dashboard notifications";
+    }
+
+    function showDashboardNotification() {
+      if (
+        "Notification" in window &&
+        Notification.permission === "granted" &&
+        dashboardNotificationsEnabled()
+      ) {
+        new Notification("Website Change Monitor", {
+          body: dashboardNotification,
+          requireInteraction: true,
+        });
+      }
+    }
+
+    if ("Notification" in window) {
+      if (Notification.permission === "granted") {
+        updateNotificationButton();
+        showDashboardNotification();
+      } else if (Notification.permission === "denied") {
+        notificationButton.textContent = "Dashboard notifications blocked";
+        notificationButton.disabled = true;
+      }
+
+      notificationButton.addEventListener("click", async () => {
+        if (Notification.permission === "granted") {
+          localStorage.setItem(
+            "dashboard-notifications",
+            dashboardNotificationsEnabled() ? "false" : "true"
+          );
+          updateNotificationButton();
+          showDashboardNotification();
+          return;
+        }
+
+        if (Notification.permission !== "denied") {
+          const permission = await Notification.requestPermission();
+          if (permission === "granted") {
+            localStorage.setItem("dashboard-notifications", "true");
+            updateNotificationButton();
+            showDashboardNotification();
+          }
+        }
+      });
+    } else {
+      notificationButton.hidden = true;
+    }
 
     const buttons =
       document.querySelectorAll(".company");

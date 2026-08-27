@@ -81,7 +81,7 @@ if __name__ == "__main__":
         }])
         raise SystemExit(0)
     if args.demo_toast:
-        notify_windows_toast([{
+        result = notify_windows_toast([{
             "company": "Example Metals",
             "new": [{
                 "type": "Press Release",
@@ -91,6 +91,7 @@ if __name__ == "__main__":
             }],
             "updated": [],
         }])
+        print(result or "No demo notification was requested.")
         raise SystemExit(0)
     run(args.company, args.webhook_url, args.popup, args.toast)
     if args.dashboard:

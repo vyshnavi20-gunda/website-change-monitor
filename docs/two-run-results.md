@@ -2,7 +2,7 @@
 
 ## Run 1 — baseline
 
-The first run checks the curated official publication pages for Norsk Hydro, Constellium, Alcoa, Ma'aden, and Rio Tinto. Every accepted publication is saved with its normalized title key, source URL, website date (when shown), first-found UTC timestamp, content hash, and a retained content version. Baseline items are deliberately marked `NEW`: there is no earlier comparison at that point.
+The recorded baseline ran on 26 August 2026 (UTC) and checked all five companies. It stored 173 publication records: 59 for Norsk Hydro, 18 for Constellium, 38 for Alcoa, 27 for Ma'aden, and 31 for Rio Tinto. Every accepted publication is saved with its normalized title key, source URL, website date (when shown), first-found UTC timestamp, content hash, and a retained content version. Baseline items are deliberately marked `NEW`: there is no earlier comparison at that point. The matching console-style evidence is in `first-run.txt`.
 
 ## Run 2 — comparison
 
@@ -16,7 +16,7 @@ The second run uses the same database and sources. The recorded comparison resul
 | Ma'aden | OK | 0 | 0 |
 | Rio Tinto | OK | 0 | 0 |
 
-The business report read: “No new or meaningfully changed publications.” Each site’s latest timestamp and any warning are available in the console report, dashboard, and SQLite `site_checks` table.
+The business report read: “No new or meaningfully changed publications.” The latest recorded comparison completed between 09:46 and 09:51 UTC on 26 August 2026. Alcoa completed with a warning because its investor pages returned anti-bot verification pages; this was displayed as a warning, not interpreted as a no-change result. Each site’s latest timestamp and warning are available in the console report, dashboard, and SQLite `site_checks` table.
 
 ## How the comparison works
 

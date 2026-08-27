@@ -16,10 +16,10 @@ from app.database import (
 from app.scraper import fetch_page_text, fetch_publications
 
 
-# Checking the newest 15 publications per company keeps the daily run bounded.
-# Older pages are already in the historical baseline; new links are discovered
-# from the curated listing sources on the next run.
-MAX_PUBLICATIONS_PER_SITE = 15
+# Check a useful recent slice of every curated source.  A per-section limit
+# prevents a busy News listing from hiding Investor Relations or report items.
+MAX_PUBLICATIONS_PER_SECTION = 10
+MAX_PUBLICATIONS_PER_SITE = 35
 
 
 def canonical_company(company: str) -> str:
@@ -185,6 +185,8 @@ def check_website(
 
                 continue
 
+            section_publications = 0
+
             for item in discovered:
 
                 key = re.sub(
@@ -197,9 +199,12 @@ def check_website(
                 if not key or len(key) < 5:
                     continue
 
+                if key not in candidates:
+                    section_publications += 1
+
                 candidates[key] = item
 
-                if len(candidates) >= MAX_PUBLICATIONS_PER_SITE:
+                if section_publications >= MAX_PUBLICATIONS_PER_SECTION:
                     break
 
         new_items = []
@@ -342,12 +347,6 @@ def check_website(
                     content_hash,
                     previous[8],
                     "seen",
-                    checked_at,
-                )
-
-                save_publication_version(
-                    previous[0],
-                    content,
                     checked_at,
                 )
 

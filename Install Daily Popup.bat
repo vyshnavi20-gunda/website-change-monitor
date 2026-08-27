@@ -1,11 +1,11 @@
 @echo off
 setlocal
 set "PROJECT=%~dp0"
-set "PYTHON=%PROJECT%.venv\Scripts\python.exe"
-set "SCRIPT=%PROJECT%main.py"
+set "RUNNER=%PROJECT%Background Monitor.vbs"
+set "WSCRIPT=%SystemRoot%\System32\wscript.exe"
 
 schtasks /Delete /TN "Website Change Monitor Popup" /F >nul 2>&1
-schtasks /Create /TN "Website Change Monitor Notification" /TR "\"%PYTHON%\" \"%SCRIPT%\" --toast" /SC HOURLY /MO 1 /RL LIMITED /IT /F
+schtasks /Create /TN "Website Change Monitor Notification" /TR "\"%WSCRIPT%\" \"%RUNNER%\"" /SC HOURLY /MO 1 /RL LIMITED /IT /F
 
 if errorlevel 1 (
     echo.

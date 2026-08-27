@@ -110,7 +110,10 @@ $toast = [Windows.UI.Notifications.ToastNotification]::new($xml)
             ["powershell.exe", "-NoProfile", "-NonInteractive", "-Command", script],
             check=True, timeout=15, capture_output=True, text=True, env=environment,
         )
-    except (OSError, subprocess.SubprocessError) as error:
+    except subprocess.CalledProcessError as error:
+        detail = (error.stderr or error.stdout or str(error)).strip()
+        return f"Toast notification failed: {detail}"
+    except (OSError, subprocess.TimeoutExpired) as error:
         return f"Toast notification failed: {error}"
 
     return f"Windows notification shown for {len(changed_items(results))} publication(s)."

@@ -22,6 +22,8 @@ Each company is defined in one site configuration, including its company name, s
 
 The scraper retrieves the official website pages and follows relevant internal links to find publication and investor-related content. It does not depend only on RSS feeds or sitemaps because those sources may be missing, incomplete or stale.
 
+Each company uses curated official News, Press Release, Investor Relations and report pages. The monitor examines a recent slice of every configured source, so a busy News page does not prevent the separate investor or report source from being checked.
+
 The collected pages are cleaned and filtered so that normal website navigation is not treated as a business publication.
 
 Examples of content intentionally ignored include:
@@ -144,6 +146,8 @@ Flask provides a simple dashboard for reviewing results.
 The main trade-off is that corporate websites differ significantly in structure. A generic scraper cannot guarantee that every dynamically generated or poorly exposed publication will always be found. Site-specific monitoring rules and filtering are therefore used where necessary.
 
 The design favors a simple and explainable process over adding external monitoring services or unnecessary infrastructure.
+
+The process is scheduled daily by default. Notifications are sent after a scheduled check records a new or changed publication; an instant notification at the exact moment a third-party website changes would require that website to offer a push/webhook service.
 
 ## 10. Extending the solution
 

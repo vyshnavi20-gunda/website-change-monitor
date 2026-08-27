@@ -3,6 +3,16 @@
 A small daily monitor for official publications on five corporate websites:
 Norsk Hydro, Constellium, Alcoa, Ma'aden, and Rio Tinto.
 
+## Local dashboard
+
+Start the dashboard server from PowerShell in the project folder:
+
+```powershell
+.\.venv\Scripts\python.exe -m app.web
+```
+
+Then open [http://127.0.0.1:5000/](http://127.0.0.1:5000/) in a browser. This address works only on this computer. Keep the PowerShell window open while using the dashboard; press `Ctrl+C` to stop the server.
+
 ## What it checks
 
 `main.py` checks each homepage plus curated official News, Press Release, Investor Relations and report pages. It does not probe guessed paths, because a routine 404 is not useful monitoring evidence. Playwright renders JavaScript pages when a normal HTTP response is insufficient. Candidate links are opened and their meaningful visible text is hashed, so a changed article is reported even when its website publication date stays the same. PDF links are hashed as binary documents, but PDF internals are never printed as report text.
@@ -80,7 +90,9 @@ This opens a sample Windows notification and does not check websites or change t
 
 For Task Scheduler, use the same argument and choose **Run only when user is logged on**. A notification cannot appear on a locked or signed-out Windows desktop; the monitor still records the result in its database.
 
-For the easiest setup, double-click `Install Daily Popup.bat`. It creates an hourly notification task, so updates can be shown throughout the day or night while you are logged in. Double-click `Run Monitor with Popup.bat` whenever you want to run it immediately.
+For a silent manual check with no command window, double-click `Check for Updates.vbs`. It shows a Windows notification only when a real update is found. For automatic checks, double-click `Install Background Notifications.bat` and choose daily or hourly monitoring. The task runs while you are logged in and notifies you only when it finds a real update.
+
+When the dashboard is open, click **Enable dashboard notifications** once. Later dashboard refreshes show a browser notification with the latest status, including “No new or changed publications” when there are no current updates. Click **Disable dashboard notifications** at any time to stop these dashboard-refresh alerts. This dashboard setting does not stop the separate `--toast` background monitor, which alerts you while the dashboard is closed.
 
 The first Playwright setup may require:
 
